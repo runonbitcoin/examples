@@ -1,0 +1,16 @@
+{
+  "name": "05-tokens",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "Run Interactive",
+  "license": "Open BSV",
+  "dependencies": {
+    "bsv": "^1.5.5",
+    "run-sdk": "^0.6.23"
+  }
+}
