@@ -1,7 +1,10 @@
 /**
  * This example demonstrates creating a real jig on testnet using node.js.
  *
- * To run, execute `node example03-testnet.js` from its directory.
+ * To run, execute:
+ * 
+ * npm install
+ * node index.js
  */
  const Run = require('run-sdk')
 
