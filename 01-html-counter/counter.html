@@ -1,0 +1,66 @@
+<!--
+    This example demonstrates the most basic jig, a simple counter. It
+    could be used to track "likes" on a website, or as a loyalty card.
+    To run, open this page in a browser and view the developer console.
+
+    You interact with the created counter using the browser console.
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Example 1: Counter</title>
+  <meta charset="utf-8">
+</head>
+
+<body>See source</body>
+<script src="https://unpkg.com/bsv@1.5.5"></script>
+<script src="https://unpkg.com/run-sdk"></script>
+<script>
+  async function main() {
+
+    // The 'mock' network is a local bitcoin blockchain on this machine.
+    // It is faster for testing and free to use. Our wallet is automatically funded.
+    const run = new Run({ network: 'mock' })
+
+    // Create a basic counter token
+    // init() is our constructor() for tokens
+    class Counter extends Jig {
+      init() {
+        this.value = 0
+      }
+
+      inc() {
+        this.value += 1
+      }
+    }
+
+    // Create a new counter instance. Ownership of it is automatically assigned to us.
+    // This will deploy the code + object automatically in the background
+    const counter = new Counter()
+
+    // Incremement a couple of times
+    counter.inc()
+    counter.inc()
+
+    // Force the counter to publish all pending transactions. This will assign
+    // its 'location', a string that uniquely identifies the current state
+    // of the counter on the blockchain.
+    await counter.sync()
+
+    // Load a second instance of the same counter using the previous counter's 'location'
+    const counter2 = await run.load(counter.location)
+
+    // Check that these counters are actually the same
+    console.log('counters the same:', counter.value === counter2.value)
+
+    // make the interactive objects globally accesible
+    window.Counter = Counter
+    window.counter = counter
+    window.counter2 = counter2
+  }
+  main()
+</script>
+
+</html>

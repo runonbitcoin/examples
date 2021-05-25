@@ -1,0 +1,82 @@
+<!--
+    This example demonstrates one jig creating another jig. In this case, an
+    Event jig creates Ticket jigs. The ticket jigs may later be redeemd at the
+    event. To run, open this page in a browser and view the developer console.
+
+    You can interact with the clases and tickets of the example from the
+    developer console.
+-->
+
+<!doctype html>
+<html>
+
+<head>
+  <title>Example 2: Tickets</title>
+  <meta charset="utf-8">
+</head>
+
+<body>See source</body>
+<script src="https://unpkg.com/bsv@1.5.5"></script>
+<script src="https://unpkg.com/run-sdk"></script>
+<script>
+  async function main() {
+
+    const run = new Run({ network: 'mock' })
+
+    // An Event jig is able to create and redeem tickets
+    class Event extends Jig {
+      init(name) {
+        this.name = name
+        this.tickets = []
+        this.redeemed = []
+      }
+
+      createTicket(address) {
+        const ticket = new Ticket(this, address)
+        this.tickets.push(ticket)
+        return ticket
+      }
+
+      redeem(ticket) {
+        if (!this.tickets.includes(ticket)) { throw new Error('missing ticket') }
+        if (this.redeemed.includes(ticket)) { throw new Error('already redeemed') }
+        this.redeemed.push(ticket)
+      }
+    }
+
+    // Tickets are separate jigs that are owned by attendees. 
+    class Ticket extends Jig {
+      init(event, address) {
+        this.event = event
+        this.owner = address
+      }
+
+      redeemed() {
+        return this.event.redeemed.includes(this)
+      }
+    }
+
+    // The Event class needs access to the Ticket class. By default, Run sandboxes all
+    // code from each other, so we have to tell Run ourselves. We use the 'deps' property.
+    Event.deps = { Ticket }
+
+    const event = new Event('Coachella')
+
+    const ticket1 = event.createTicket('mqoWXN4jiDferEhAM5mmXGxHthVtcxf67N')
+    const ticket2 = event.createTicket('muaqCTgXKpMdQCiksFp8nwV4W8oFgrMhzq')
+
+    event.redeem(ticket1)
+
+    console.log('Ticket 1 redeemed', ticket1.redeemed())
+    console.log('Ticket 2 redeemed', ticket2.redeemed())
+
+    // make the interactive objects globally accesible
+    window.Event = Event
+    window.Ticket = Ticket
+    window.ticket1 = ticket1
+    window.ticket2 = ticket2
+  }
+  main()
+</script>
+
+</html>
