@@ -1,0 +1,16 @@
+{
+  "name": "08-locks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bsv": "^1.5.5",
+    "run-sdk": "^0.6.23"
+  }
+}
