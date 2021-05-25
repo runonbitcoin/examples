@@ -1,0 +1,15 @@
+{
+  "name": "03-testnet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": ""
+  },
+  "keywords": [],
+  "author": "Run Interactive",
+  "license": "ISC",
+  "dependencies": {
+    "run-sdk": "^0.6.23"
+  }
+}
