@@ -1,5 +1,5 @@
 {
-  "name": "nfts-with-data",
+  "name": "nfts",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bsv": "^1.5.6",
     "run-sdk": "^0.6.23"
   }
 }
