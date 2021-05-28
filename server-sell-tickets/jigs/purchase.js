@@ -1,4 +1,4 @@
-const Run = require('run-sdk');
+const Run = require('run-sdk')
 const { Event } = require('./event')
 
 const { expect } = Run.extra

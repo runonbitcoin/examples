@@ -7,7 +7,7 @@ const asyncHandler = require('express-async-handler')
 /**
  * This function builds an express app. It takes
  * a run instance as a dependency.
- * 
+ *
  * In this app we decided to communicate with the clients
  * exchanging jig locations. This is an easy way to keep
  * the reponses and reqests tiny.
@@ -34,7 +34,7 @@ const buildApp = async (run) => {
 
   // Ensure that all the code is deployed and the events are created.
   await run.sync()
-  
+
   app.use((_req, _res, next) => {
     // In our example we have more than one instance of run, so we need to ensure
     // that the server one is active for each request. This is not needed if the
@@ -69,7 +69,7 @@ const buildApp = async (run) => {
    * Consumes a purchase to generate a ticket.
    */
   app.post('/submit-purchase', asyncHandler(async (req, res) => {
-    const { 
+    const {
       purchaseLocation,
       eventLocation
     } = req.body
