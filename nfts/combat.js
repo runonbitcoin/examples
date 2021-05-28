@@ -179,36 +179,42 @@ const main = async () => {
   const DeployedCharacter = run.deploy(Character)
 
   /** Create weapons */
-
+  await run.sync()
   console.log(`Before creating any weapon both weapon clases
 had their forgeCount set to 0:
 
-DeployedSword.forgeCount: ${DeployedSword.forgeCount}
-DeployedKnife.forgeCount: ${DeployedKnife.forgeCount}
-DeployedStaff.forgeCount: ${DeployedStaff.forgeCount}
+DeployedSword.forgeCount: ${DeployedSword.forgeCount} ${DeployedSword.location}
+DeployedKnife.forgeCount: ${DeployedKnife.forgeCount} ${DeployedKnife.location}
+DeployedStaff.forgeCount: ${DeployedStaff.forgeCount} ${DeployedStaff.location}
   `)
 
   // create a few weapons
   console.log('Creating sword 1...')
   const sword1 = DeployedSword.forge(await run.owner.nextOwner())
   console.log('Creating sword 2...')
+  await run.sync()
   const sword2 = DeployedSword.forge(await run.owner.nextOwner())
   console.log('Creating sword 3...')
+  await run.sync()
   const sword3 = DeployedSword.forge(await run.owner.nextOwner())
+  await run.sync()
   console.log('Creating sword 4...')
   const sword4 = DeployedSword.forge(await run.owner.nextOwner())
+  await run.sync()
   console.log('Creating knife 1...')
   const knife1 = DeployedKnife.forge(await run.owner.nextOwner())
+  await run.sync()
   console.log('Creating staff 1...')
   const staff1 = DeployedStaff.forge(await run.owner.nextOwner())
+  await run.sync()
 
   console.log(`
   
-After creating some weapons the counters increase:
+After creating some weapons the counters increase and the classes have new locations:
 
-DeployedSword.forgeCount: ${DeployedSword.forgeCount}
-DeployedKnife.forgeCount: ${DeployedKnife.forgeCount}
-DeployedStaff.forgeCount: ${DeployedStaff.forgeCount}
+DeployedSword.forgeCount: ${DeployedSword.forgeCount} ${DeployedSword.location}
+DeployedKnife.forgeCount: ${DeployedKnife.forgeCount} ${DeployedKnife.location}
+DeployedStaff.forgeCount: ${DeployedStaff.forgeCount} ${DeployedStaff.location}
   `)
 
   // create 2 characters
@@ -244,7 +250,7 @@ DeployedStaff.forgeCount: ${DeployedStaff.forgeCount}
     DeployedSword.forge(await run.owner.nextOwner())
   } catch (e) {
     console.log('Create sword number 21 failed with error:')
-    // console.log(e)
+    console.error(e)
   }
 }
 
