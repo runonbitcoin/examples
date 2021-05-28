@@ -1,7 +1,7 @@
 /**
  * In this example we are going to create
  * nfts that represent tickets for an event.
- * 
+ *
  * The owner of the event is the one that can create tickets.
  * Each ticket and each event are unique items
  */
@@ -11,20 +11,19 @@ const Address = require('bsv/lib/address')
 
 const { expect } = Run.extra
 
-
 /**
  * Tickets are owned by the people
  * that assist to the events.
- * 
+ *
  * They can be send to other users.
  */
 class Ticket extends Jig {
   /**
    * @param {Event} event this is the event related with the ticket
-   * @param {*} id 
-   * @param {*} owner 
+   * @param {*} id
+   * @param {*} owner
    */
-  init(event, id, owner) {
+  init (event, id, owner) {
     this.event = event
     this.id = id
     this.owner = owner
@@ -32,7 +31,7 @@ class Ticket extends Jig {
 
   /**
    * Tickets can be send to other people
-   * @param {Lock} to 
+   * @param {Lock} to
    */
   send (to) {
     this.owner = to
@@ -44,7 +43,7 @@ class Ticket extends Jig {
    * The issuer can destroy it then.
    */
   redeem () {
-    if(this.owner !== even.owner) {
+    if (this.owner !== this.event.owner) {
       throw new Error('only the creator can redeem the tickets')
     }
 
@@ -55,11 +54,11 @@ class Ticket extends Jig {
 /**
  * An event can emit tickets. Someone
  * with a ticket can enter into the event.
- * 
+ *
  * Each event has a name and a total
  * amount of tickets that can be emited.
  */
- class Event extends Jig {
+class Event extends Jig {
   init (name, totalChairs) {
     expect(name).toBeString()
     expect(totalChairs).toBeInteger()
@@ -92,8 +91,9 @@ const main = async () => {
   const buyer3Address = Address.fromPrivateKey(bsv.PrivateKey.fromRandom()).toString()
 
   // deploy clases
-  Event = run.deploy(Event)
-  Ticket = run.deploy(Ticket)
+  run.deploy(Event)
+  run.deploy(Ticket)
+  await run.sync()
 
   // Create an event
   const anEvent = new Event('Super exclusive event', 3)
@@ -120,9 +120,8 @@ const main = async () => {
   // Selling another ticket fails
   const locationBefore = anEvent.location
   try {
-    
     anEvent.emitTicket(Address.fromPrivateKey(bsv.PrivateKey.fromRandom()).toString())
-  } catch(e) {
+  } catch (e) {
     console.error(e)
     // Because the action failed there was no changes in the jig.
     await anEvent.sync()

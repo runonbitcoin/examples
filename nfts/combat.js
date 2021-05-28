@@ -1,12 +1,12 @@
 /**
  * This is a variation of the example created here by
  * Joshua Henslee https://www.youtube.com/watch?v=KIz94YnVJug&t=857s.
- * 
+ *
  * The idea is create a few NFTs. In this case we are creating
  * jigs that represents weapons in a video game. Each weapon is unique
  * and can be identified and treated differently. But weapons
  * of the same class have similar behavior.
- * 
+ *
  * In this case
  */
 
@@ -50,7 +50,6 @@ class Sword extends Weapon {
   attackPower () {
     return this.id // Each sword has a different attack power
   }
-
 
   /**
    * Only the owner of the Sword class can create
@@ -122,7 +121,6 @@ class Staff extends Weapon {
 Staff.maxAmount = 3
 Staff.forgeCount = 0
 
-
 /**
  * Characters are also unique and can be equiped with weapons.
  */
@@ -170,55 +168,54 @@ const main = async () => {
   const run = new Run({ network: 'mock' })
 
   /** Deploy classes
-   * 
+   *
    * Deploy code is synchronous. The deploy method returns the wropped
    * class, ready to be use in your app.
    */
   console.log('deploying clases')
-  Sword = run.deploy(Sword)
-  Knife = run.deploy(Knife)
-  Staff = run.deploy(Staff)
-  Character =  run.deploy(Character)
+  const DeployedSword = run.deploy(Sword)
+  const DeployedKnife = run.deploy(Knife)
+  const DeployedStaff = run.deploy(Staff)
+  const DeployedCharacter = run.deploy(Character)
 
   /** Create weapons */
 
   console.log(`Before creating any weapon both weapon clases
 had their forgeCount set to 0:
 
-Sword.forgeCount: ${Sword.forgeCount}
-Knife.forgeCount: ${Knife.forgeCount}
+DeployedSword.forgeCount: ${DeployedSword.forgeCount}
+DeployedKnife.forgeCount: ${DeployedKnife.forgeCount}
+DeployedStaff.forgeCount: ${DeployedStaff.forgeCount}
   `)
 
   // create a few weapons
   console.log('Creating sword 1...')
-  const sword1 = Sword.forge(await run.owner.nextOwner())
+  const sword1 = DeployedSword.forge(await run.owner.nextOwner())
   console.log('Creating sword 2...')
-  const sword2 = Sword.forge(await run.owner.nextOwner())
+  const sword2 = DeployedSword.forge(await run.owner.nextOwner())
   console.log('Creating sword 3...')
-  const sword3 = Sword.forge(await run.owner.nextOwner())
+  const sword3 = DeployedSword.forge(await run.owner.nextOwner())
   console.log('Creating sword 4...')
-  const sword4 = Sword.forge(await run.owner.nextOwner())
+  const sword4 = DeployedSword.forge(await run.owner.nextOwner())
   console.log('Creating knife 1...')
-  const knife1 = Knife.forge(await run.owner.nextOwner())
+  const knife1 = DeployedKnife.forge(await run.owner.nextOwner())
   console.log('Creating staff 1...')
-  const staff1 = Staff.forge(await run.owner.nextOwner())
+  const staff1 = DeployedStaff.forge(await run.owner.nextOwner())
 
   console.log(`
   
 After creating some weapons the counters increase:
 
-Sword.forgeCount: ${Sword.forgeCount}
-Knife.forgeCount: ${Knife.forgeCount}
+DeployedSword.forgeCount: ${DeployedSword.forgeCount}
+DeployedKnife.forgeCount: ${DeployedKnife.forgeCount}
+DeployedStaff.forgeCount: ${DeployedStaff.forgeCount}
   `)
-
-
 
   // create 2 characters
   console.log('creating chraracters...')
-  const aCharacter = new Character('finn', await run.owner.nextOwner())
-  const anotherCharacter = new Character('jake', await run.owner.nextOwner())
+  const aCharacter = new DeployedCharacter('finn', await run.owner.nextOwner())
+  const anotherCharacter = new DeployedCharacter('jake', await run.owner.nextOwner())
 
-  
   // equip weapons
   console.log('equiping weapons...')
   aCharacter.equip(sword1)
@@ -228,27 +225,26 @@ Knife.forgeCount: ${Knife.forgeCount}
   anotherCharacter.equip(sword4)
   anotherCharacter.equip(staff1)
 
-
   /** Creating every sword other sword
-   * 
+   *
    *  Because swords can only be forged there can only be a certain amount.
    *  Let's create every sword left and then try to create another one
    */
 
-  await run.sync()  
-  await Promise.all(new Array(Sword.maxAmount - Sword.forgeCount).fill(1).map(async () => {
-    const sword = Sword.forge(await run.owner.nextOwner())
+  await run.sync()
+  await Promise.all(new Array(DeployedSword.maxAmount - DeployedSword.forgeCount).fill(1).map(async () => {
+    const sword = DeployedSword.forge(await run.owner.nextOwner())
     console.log('creating sword number', sword.id)
     await run.sync()
   }))
 
   // Attempting to create extra sword.
   try {
-    console.log('trying to create swornd number 21')
-    Sword.forge(await run.owner.nextOwner())
+    console.log('trying to create sword number 21')
+    DeployedSword.forge(await run.owner.nextOwner())
   } catch (e) {
     console.log('Create sword number 21 failed with error:')
-    console.log(e)
+    // console.log(e)
   }
 }
 
