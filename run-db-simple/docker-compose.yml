@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  run-db:
+    image: runonbitcoin/run-db:1.0.9
+    volumes: 
+    #   - run-db-data:/data
+      - ./run-db-snapshot.sqlite3:/data/run-db.sqlite3
+    ports: 
+      - 8000:8000
+    environment: 
+      PORT: 8000
+      WORKERS: '24'
+      DEFAULT_TRUSTLIST: "fa4ae4ebbfe0700d539e7de1e0e7f588dc6c915b459a5d934175cbb1ba82ae71,88c4784192d172e99b65bd18493204fe9ca0d499e345bd6400f5ec1a4d012b6e"
+      PLANARIA_TOKEN: ${PLANARIA_TOKEN}
+      API: "planaria"
+      START_HEIGHT: 688241
+      FETCH_LIMIT: 100

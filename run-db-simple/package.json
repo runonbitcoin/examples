@@ -1,0 +1,19 @@
+{
+  "name": "run-db-simple",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "with-run-db": "node --require=debugging-aid/network with-run-db.js",
+    "withouth-run-db": "node --require=debugging-aid/network no-run-db.js"
+  },
+  "keywords": [],
+  "author": "Run Interactive",
+  "license": "Open BSV",
+  "dependencies": {
+    "run-sdk": "^0.6.23"
+  },
+  "devDependencies": {
+    "debugging-aid": "^0.5.3"
+  }
+}
