@@ -27,6 +27,8 @@ Once that's  there you can start your run-db by doing:
 This is going to generate a lot of output. That's because run-db is
 getting in sync with the bsv blockchain.
 
+Once the output shows that it's up to date, you can go
+to a different terminal and continue.
 
 ### Running the scripts
 
