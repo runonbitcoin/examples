@@ -9,17 +9,17 @@ async function signTxUsingLocks(owner, locks) {
 
   const tx = new Tx()
   tx.addTxOut(new Bn().fromNumber(1000), Address.fromRandom())
-  lockingScripts.forEach(lockingScript => {
+  lockingScripts.forEach(_lockingScript => {
     tx.addTxIn(
       Buffer.alloc(32).fill(1),
       0,
-      lockingScript
+      Script.fromAsmString('0 0')
     )
   })
 
-  await owner.sign(
+  return owner.sign(
     tx.toHex(), 
-    lockingScripts.map((lockingScript) => ({ satoshis: 2000, script: lockingScript})), 
+    lockingScripts.map((lockingScript) => ({ satoshis: 2000, script: lockingScript.toHex()})), 
     locks
   )
 }
@@ -189,6 +189,15 @@ describe(Owner, () => {
       firstLocks.forEach(lock => {
         expect(newerLocksScripts).not.toContain(lock.script())
       })
+    })
+  })
+
+  describe('#sign', () => {
+    test('it signs tx using one related lock', async () => {
+      const firstLock = await anOwner.nextOwner()
+      const signedTxHex = await signTxUsingLocks(anOwner, [ firstLock ])
+      const tx = Tx.fromHex(signedTxHex)
+      expect(tx.txIns[0].script).not.toEqual(Script.fromAsmString('0 0'))
     })
   })
 })
