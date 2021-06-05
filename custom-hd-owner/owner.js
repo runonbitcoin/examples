@@ -8,48 +8,52 @@ class Owner {
       Bip39.fromString(mnemonicString.trim()).toSeed()
     ).derive(Owner.BASE_PATH)
     this.db = db
-    this.lowerBound = 0
-    this.nextIndex = 0
-    this.upperBound = 20
-    this.byAddress = new Map()
-    this.byIndex = new Map()
-    this._fillAddresses()
+  }
+
+  async initialize () {
+    let data = await this.db.findWalletDataByXpub(this.bip32.toPublic().toString())
+    if (!data) {
+      data = await this.db.createWalletData(this.bip32.toPublic().toString())
+    }
+    this.walletDataId = data.id
+    await this._fillAddresses(data)
   }
 
   async nextOwner () {
-    const { address } = this.byIndex.get(this.nextIndex)
-    this._bumpNextIndex()
+    const { lowerBound, upperBound, nextIndex } = await this.db.findWalletDataById(this.walletDataId)
+    const { address } = await this.db.addressByIndex(this.walletDataId, nextIndex)
+    await this._bumpNextIndex(lowerBound, upperBound, nextIndex)
     return new CommonLock(address.toString(), false)
   }
 
   async sign(rawTx, parents, locks) {
-    const allIndexes = locks
-      .filter(lock => this.byAddress.get(lock.address))
-      .map(lock => {
-        const { index } = this.byAddress.get(lock.address)
-        return index
-      })
-    const maxIndex = Math.max(...allIndexes)
-    this.lowerBound = Math.max(maxIndex + 1, this. lowerBound)
-    this.upperBound = this.lowerBound + 20 
-    this._fillAddresses()
+    const allAddressesStr = locks
+      .map(lock => lock.address)
+    const allAddressesDb = await this.db.findManyAddreses(this.walletDataId, allAddressesStr)
+    const maxIndexUsed = Math.max(
+      ...allAddressesDb.map(a => a.index)
+    )
+    let { lowerBound, upperBound, nextIndex } = await this.db.findWalletDataById(this.walletDataId)
+    lowerBound = Math.max(maxIndexUsed + 1, lowerBound)
+    upperBound = lowerBound + 20
+    await this.db.updateWalletDataById(this.walletDataId, { lowerBound, upperBound, nextIndex })
+    await this._fillAddresses({ lowerBound, upperBound })
   }
 
-  _bumpNextIndex () {
-    this.nextIndex = this.nextIndex + 1
-    if (this.nextIndex >= this.upperBound) {
-      this.nextIndex = this.lowerBound
+  async _bumpNextIndex (lowerBound, upperBound, nextIndex) {
+    nextIndex = nextIndex + 1
+    if (nextIndex >= upperBound) {
+      nextIndex = lowerBound
     }
+    await this.db.updateWalletDataById(this.walletDataId, { lowerBound, upperBound, nextIndex })
   }
 
-  _fillAddresses () {
-    range(this.lowerBound, this.upperBound).forEach((index) => {
+  async _fillAddresses ({ lowerBound, upperBound }) {
+    await Promise.all(range(lowerBound, upperBound).map(async (index) => {
       const address = Address.fromPubKey(this.bip32.deriveChild(index).pubKey)
-      this.byAddress.set(address.toString(), {
-        index
-      })
-      this.byIndex.set(index, { address: address.toString() })
-    })
+
+      await this.db.createAddress(this.walletDataId, address.toString(), index)
+    }))
   }
 }
 

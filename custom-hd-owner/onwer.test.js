@@ -24,12 +24,26 @@ async function signTxUsingLocks(owner, locks) {
   )
 }
 
+async function nextNLocks (owner, n) {
+  const locks = []
+  for (const _i of _.range(n)) {
+    const lock = await owner.nextOwner()
+    locks.push(lock)
+  }  
+  return locks
+}
+
+async function next20Locks (owner) {
+  return nextNLocks(owner, 20)
+}
+
 describe(Owner, () => {
   let anOwner = null
   const aMnemonic = 'trap note skull stool throw submit behind outer language victory bar pitch'
 
-  beforeEach(() => {
+  beforeEach(async () => {
     anOwner = new Owner(aMnemonic, new DB())
+    await anOwner.initialize()
   })
 
   describe('#nextOwner', () => {
@@ -47,13 +61,8 @@ describe(Owner, () => {
     })
 
     test('it loops every 20 calls if no signature was made in the middle', async () => {
-      const firstLoop = await Promise.all(
-        _.range(20).map(async () => (await anOwner.nextOwner()).script())
-      )
-
-      const secondLoop = await Promise.all(
-        _.range(20).map(async () => (await anOwner.nextOwner()).script())
-      )
+      const firstLoop = await next20Locks(anOwner)
+      const secondLoop = await next20Locks(anOwner)
 
       _.zip(firstLoop, secondLoop).forEach(([first, second]) => {
         expect(first).toEqual(second)
@@ -65,7 +74,7 @@ describe(Owner, () => {
 
       await signTxUsingLocks(anOwner, [ firstLock ])
 
-      await Promise.all(_.range(19).map(() => anOwner.nextOwner()))
+      await nextNLocks(anOwner, 19)
 
       const twentiFirstOwner = await anOwner.nextOwner()
 
@@ -78,7 +87,7 @@ describe(Owner, () => {
 
       await signTxUsingLocks(anOwner, [ firstLock ])
 
-      await Promise.all(_.range(19).map(() => anOwner.nextOwner()))
+      await nextNLocks(anOwner, 19)
 
       const twentiSecondLock = await anOwner.nextOwner()
 
@@ -96,9 +105,7 @@ describe(Owner, () => {
       await signTxUsingLocks(anOwner, [ tenthLock ])
 
       // Get next 20 locks
-      const newerLocksScripts = await Promise.all(
-        _.range(20).map(async () => (await anOwner.nextOwner()).script())
-      )
+      const newerLocksScripts = next20Locks(anOwner)
 
       firstLocks.forEach(lock => {
         expect(newerLocksScripts).not.toContain(lock.script())
@@ -138,13 +145,9 @@ describe(Owner, () => {
       // Sign a tx
       await signTxUsingLocks(anOwner, [ tenthLock ])
 
-      const firstLoop = await Promise.all(
-        _.range(20).map(async () => (await anOwner.nextOwner()).script())
-      )
+      const firstLoop = next20Locks(anOwner)
 
-      const secondLoop = await Promise.all(
-        _.range(20).map(async () => (await anOwner.nextOwner()).script())
-      )
+      const secondLoop = next20Locks(anOwner)
 
       _.zip(firstLoop, secondLoop).forEach(([first, second]) => {
         expect(first).toEqual(second)
@@ -159,9 +162,7 @@ describe(Owner, () => {
       await signTxUsingLocks(anOwner, [firstLocks[0], firstLocks[9]])
 
       // Find next 20 scripts
-      const newerLocksScripts = await Promise.all(
-        _.range(20).map(async () => (await anOwner.nextOwner()).script())
-      )
+      const newerLocksScripts = (await next20Locks(anOwner)).map(lock => lock.script())
 
       // Check locks did not repeat
       firstLocks.forEach(lock => {
@@ -182,9 +183,7 @@ describe(Owner, () => {
       )])
 
       // Find next 20 scripts
-      const newerLocksScripts = await Promise.all(
-        _.range(20).map(async () => (await anOwner.nextOwner()).script())
-      )
+      const newerLocksScripts = (await next20Locks(anOwner)).map(lock => lock.script())
 
       // Check locks did not repeat
       firstLocks.forEach(lock => {
