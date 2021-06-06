@@ -2,11 +2,11 @@ const { Bip32, Bip39, Address, Tx, KeyPair, Sig, Script, Bn } = require('bsv')
 const { CommonLock } = require('run-sdk').util
 const _ = require('lodash')
 
-class Owner {
+class HdOwner {
   constructor (mnemonicString, db) {
     this.bip32 = Bip32.fromSeed(
       Bip39.fromString(mnemonicString.trim()).toSeed()
-    ).derive(Owner.BASE_PATH)
+    ).derive(HdOwner.BASE_PATH)
     this.db = db
   }
 
@@ -16,18 +16,19 @@ class Owner {
       data = await this.db.createWalletData(this.bip32.toPublic().toString())
     }
     this.walletDataId = data.id
-    await this._fillAddresses(data)
+    await this._fillAddresses(data.upperBound)
   }
 
   async nextOwner () {
     const { lowerBound, upperBound, nextIndex } = await this.db.findWalletDataById(this.walletDataId)
     const { address } = await this.db.addressByIndex(this.walletDataId, nextIndex)
     await this._bumpNextIndex(lowerBound, upperBound, nextIndex)
-    return new CommonLock(address.toString(), false)
+    return address.toString()
   }
 
   async sign(rawTx, parents, locks) {
     const allAddressesStr = locks
+      .filter(lock => lock)
       .map(lock => lock.address)
     const allAddressesDb = await this.db.findManyAddreses(this.walletDataId, allAddressesStr)
     const signedRawTx = this.performSignature(rawTx, parents, locks, allAddressesDb)
@@ -38,13 +39,16 @@ class Owner {
     lowerBound = Math.max(maxIndexUsed + 1, lowerBound)
     upperBound = lowerBound + 20
     await this.db.updateWalletDataById(this.walletDataId, { lowerBound, upperBound, nextIndex })
-    await this._fillAddresses({ lowerBound, upperBound })
+    await this._fillAddresses(upperBound)
     return signedRawTx
   }
 
   performSignature (unsignedRawTx, parents, locks, addressesObject) {
     const tx = Tx.fromHex(unsignedRawTx)
     _.zip(parents, locks).forEach(([parent, lock], nIn) => {
+      if (!lock) {
+        return
+      }
       const relatedAddress = addressesObject.find(o => o.address === lock.address)
       if (relatedAddress) {
         const keyPair = KeyPair.fromPrivKey(this.bip32.deriveChild(relatedAddress.index).privKey)
@@ -73,15 +77,15 @@ class Owner {
     await this.db.updateWalletDataById(this.walletDataId, { lowerBound, upperBound, nextIndex })
   }
 
-  async _fillAddresses ({ lowerBound, upperBound }) {
+  async _fillAddresses (upperBound) {
+    const lowerBound = await this.db.lastAddressIndexForWallet(this.walletDataId)
     await Promise.all(_.range(lowerBound, upperBound).map(async (index) => {
       const address = Address.fromPubKey(this.bip32.deriveChild(index).pubKey)
-
       await this.db.createAddress(this.walletDataId, address.toString(), index)
     }))
   }
 }
 
-Owner.BASE_PATH = "m/0'/0"
+HdOwner.BASE_PATH = "m/0'/0"
 
-module.exports = { Owner }
+module.exports = { HdOwner }

@@ -59,6 +59,11 @@ class DB {
     const addresses = this.addressesPerWallet.get(walletDataId)
     return addresses.filter(a => addressesStr.includes(a.address)) 
   }
+
+  async lastAddressIndexForWallet(walletDataId) {
+    const addresses = this.addressesPerWallet.get(walletDataId)
+    return Math.max(0, ...addresses.map(a => a.index))
+  }
 }
 
 module.exports = { DB }
