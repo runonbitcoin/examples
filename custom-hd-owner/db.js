@@ -1,67 +1,68 @@
 class DB {
   constructor () {
-    this.walletDatasByXpub = new Map()
-    this.walletDatasById = new Map()
-    this.addressesPerWallet = new Map()
+    this.tables = new Map()
+    this.tables.set('walletData', [])
+    this.tables.set('addresses', [])
   }
   async findWalletDataByXpub(anXpubStr) {
-    return this.walletDatasByXpub.get(anXpubStr)
+    const walletDataTable = this.tables.get('walletData')
+    return walletDataTable.find(walletData => walletData.xpub === anXpubStr)
   }
 
   async findWalletDataById(id) {
-    return this.walletDatasById.get(id)
+    const walletDataTable = this.tables.get('walletData')
+    return walletDataTable.find(walletData => walletData.id === id)
   }
 
   async updateWalletDataById(walletDataId, { lowerBound, upperBound, nextIndex }) {
-    const oldWalletData = this.walletDatasById.get(walletDataId)
-    const newWalletData = { 
+    const walletDataTable = this.tables.get('walletData')
+    const walletDataIndex = walletDataTable.findIndex(walletData => walletData.id === walletDataId)
+    const oldWalletData = walletDataTable[walletDataIndex]
+    walletDataTable[walletDataIndex] = { 
       ...oldWalletData,
       lowerBound, 
       upperBound, 
       nextIndex 
     }
-    this.walletDatasById.set(oldWalletData.id, newWalletData)
-    this.walletDatasByXpub.set(oldWalletData.xpub, newWalletData)
   }
 
   async createWalletData (xPubStr) {
+    const walletDataTable = this.tables.get('walletData')
     const walletData = {
-      id: this.walletDatasById.size,
+      id: walletDataTable.length,
       xpub: xPubStr,
       lowerBound: 0,
       upperBound: 20,
       nextIndex: 0
     }
+    walletDataTable.push(walletData)
 
-    this.walletDatasByXpub.set(walletData.xpub, walletData)
-    this.walletDatasById.set(walletData.id, walletData)
-    this.addressesPerWallet.set(walletData.id, [])
     return walletData
   }
 
-  async createAddress(walletDataId, addressStr, index, used = false) {
-    const addresses = this.addressesPerWallet.get(walletDataId)
-    addresses.push({
-      walletId: walletDataId,
+  async createAddress(walletDataId, addressStr, index) {
+    const addressTable = this.tables.get('addresses')
+    addressTable.push({
+      walletDataId: walletDataId,
       address: addressStr,
-      index,
-      used
+      index
     })
   }
 
   async addressByIndex(walletDataId, addressIndex) {
-    const addresses = this.addressesPerWallet.get(walletDataId)
-    const address = addresses.find(a => a.index === addressIndex)
+    const addressTable = this.tables.get('addresses')
+    const address = addressTable.find(a => a.index === addressIndex && a.walletDataId === walletDataId)
     return address
   }
 
   async findManyAddreses(walletDataId, addressesStr) {
-    const addresses = this.addressesPerWallet.get(walletDataId)
-    return addresses.filter(a => addressesStr.includes(a.address)) 
+    const addressTable = this.tables.get('addresses')
+    return addressTable.filter(a => addressesStr.includes(a.address) && a.walletDataId === walletDataId)
   }
 
   async lastAddressIndexForWallet(walletDataId) {
-    const addresses = this.addressesPerWallet.get(walletDataId)
+    const addressTable = this.tables.get('addresses')
+    const addresses = addressTable.filter(a => a.walletDataId === walletDataId)
     return Math.max(0, ...addresses.map(a => a.index))
   }
 }
