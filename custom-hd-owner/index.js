@@ -14,7 +14,7 @@ class Box extends Run.Jig {
 }
 
 const main = async () => {
-  // Initialize run instance with an HdOwner
+  // Initialize RUN instance with an HdOwner
   const db = new DB()
   const aMnemonic = 'trap note skull stool throw submit behind outer language victory bar pitch'
   const owner = new HdOwner(aMnemonic, db)

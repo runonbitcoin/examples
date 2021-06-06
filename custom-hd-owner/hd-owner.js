@@ -2,7 +2,7 @@ const { Bip32, Bip39, Address, Tx, KeyPair, Sig, Script, Bn } = require('bsv')
 const _ = require('lodash')
 
 /**
- * This is an implementation of run owner api (https://run.network/docs/#api-reference-apis-owner)
+ * This is an implementation of RUN owner api (https://run.network/docs/#api-reference-apis-owner)
  * using an hd-wallet like strategy to calculate the private keys to lock the jigs.
  * 
  * There is a ton of room for decition on wallet dessign. This dessign is an ilustrative dessign
@@ -44,7 +44,7 @@ class HdOwner {
 
 
   /**
-   * First method of run owner interface.
+   * First method of RUN owner interface.
    */
   async nextOwner () {
     // Gets the needed data find the new address
@@ -58,7 +58,7 @@ class HdOwner {
   
   
   /**
-   * Second method of Run's owner interface.
+   * Second method of RUN's owner interface.
    * 
    * Sign a tx is a little bit tricky because we need
    * to consider all the addresses and also update the known
