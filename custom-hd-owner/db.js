@@ -1,3 +1,8 @@
+/**
+ * This class is just an hipotetical storage for wallet data.
+ * 
+ * The idea of the implementation is to resemble a real relational db.
+ */
 class DB {
   constructor () {
     this.tables = new Map()
