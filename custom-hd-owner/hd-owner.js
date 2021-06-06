@@ -1,5 +1,4 @@
 const { Bip32, Bip39, Address, Tx, KeyPair, Sig, Script, Bn } = require('bsv')
-const { CommonLock } = require('run-sdk').util
 const _ = require('lodash')
 
 class HdOwner {
