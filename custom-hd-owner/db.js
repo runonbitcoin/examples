@@ -21,7 +21,7 @@ class DB {
       nextIndex 
     }
     this.walletDatasById.set(oldWalletData.id, newWalletData)
-    this.walletDatasByXpub.set(oldWalletData.xpub, oldWalletData.id, newWalletData)
+    this.walletDatasByXpub.set(oldWalletData.xpub, newWalletData)
   }
 
   async createWalletData (xPubStr) {
