@@ -1,0 +1,21 @@
+{
+  "name": "custom-hd-owner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bsv": "^2.0.10",
+    "run-sdk": "^0.6.24",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "jest": "^27.0.4"
+  }
+}
