@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  bitcoind:
+    build: ./bitcoind
+    ports:
+    - 18332:18332 # rpc
+    - 28332:28332 # zmq
+    volumes:
+      - bsvnode-data:/bitcoin/data
+      - ./bitcoind/bitcoin.conf:/bitcoin/bitcoin.conf
+
+  run-db:
+    image: runonbitcoin/run-db:1.0.12
+    environment:
+      PORT: ${RUN_DB_PORT}
+      API: bitcoin-node
+      ZMQ_URL: 'tcp://bitcoind:28332'
+      RPC_URL: 'http://bitcoin:bitcoin@bitcoind:18332'
+    ports:
+      - ${RUN_DB_PORT}:${RUN_DB_PORT}
+    depends_on:
+      - bitcoind
+
+volumes:
+  bsvnode-data:

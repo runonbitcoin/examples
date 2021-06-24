@@ -1,0 +1,4 @@
+PURSE_WIF=<wif1>
+OWNER_WIF=<wif2>
+NETWORK=testnet
+RUN_DB_PORT=3500
