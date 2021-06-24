@@ -22,14 +22,4 @@ Dragon.deps = {
   expect: Run.extra.expect
 }
 
-Dragon.presets = {
-  test: {
-    origin: '8f1fe8a89bcd0d3fd5374b25a2969c8ea7871e278fd2973e5fe1abe42bb1360d_o1',
-    location: '8f1fe8a89bcd0d3fd5374b25a2969c8ea7871e278fd2973e5fe1abe42bb1360d_o1',
-    nonce: 0,
-    owner: '13amCautaFqwbWV6MoC86xrh96W4fXGfDV',
-    satoshis: 0
-  }
-}
-
 module.exports = { Dragon }
