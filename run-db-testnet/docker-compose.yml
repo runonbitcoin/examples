@@ -14,12 +14,17 @@ services:
     environment:
       PORT: ${RUN_DB_PORT}
       API: bitcoin-node
+      NETWORK: test
       ZMQ_URL: 'tcp://bitcoind:28332'
       RPC_URL: 'http://bitcoin:bitcoin@bitcoind:18332'
+      START_HEIGHT: 1333016
     ports:
       - ${RUN_DB_PORT}:${RUN_DB_PORT}
+    volumes: 
+      - run-db-data:/data
     depends_on:
       - bitcoind
 
 volumes:
   bsvnode-data:
+  run-db-data:
