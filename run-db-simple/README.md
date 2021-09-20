@@ -1,4 +1,4 @@
-# Simple RUN-DB example
+# Simple Run-DB example
 
 This is a tiny example to understand the usecase of run db.
 
